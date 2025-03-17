@@ -1,0 +1,85 @@
+import random
+
+class Robot:
+    def __init__(self, nama, hp, attack):
+        self.nama = nama
+        self.hp = hp
+        self.attack = attack
+
+    def serang(self, musuh):
+        damage = random.randint(0, self.attack)
+        musuh.hp -= damage
+        return damage
+
+    def bertahan(self):
+        return random.randint(5, 15)  # Menambah HP saat bertahan
+
+    def is_alive(self):
+        return self.hp > 0
+
+class Game:
+    def __init__(self, robot1, robot2):
+        self.robot1 = robot1
+        self.robot2 = robot2
+        self.round = 1
+
+    def mulai(self):
+        while self.robot1.is_alive() and self.robot2.is_alive():
+            print(f"Round-{self.round}")
+            print(f"{self.robot1.nama} [HP: {self.robot1.hp}] VS {self.robot2.nama} [HP: {self.robot2.hp}]")
+
+            # Robot 1 memilih aksi
+            aksi1 = self.pilih_aksi(self.robot1)
+            if aksi1 == 1:
+                damage = self.robot1.serang(self.robot2)
+                print(f"{self.robot1.nama} menyerang {self.robot2.nama} dan memberikan {damage} damage.")
+            elif aksi1 == 2:
+                heal = self.robot1.bertahan()
+                self.robot1.hp += heal
+                print(f"{self.robot1.nama} bertahan dan memulihkan {heal} HP.")
+            else:
+                print(f"{self.robot1.nama} menyerah! {self.robot2.nama} menang!")
+                break
+
+            # Periksa apakah robot 2 masih hidup
+            if not self.robot2.is_alive():
+                print(f"{self.robot2.nama} telah kalah. {self.robot1.nama} menang!")
+                break
+
+            # Robot 2 memilih aksi
+            aksi2 = self.pilih_aksi(self.robot2)
+            if aksi2 == 1:
+                damage = self.robot2.serang(self.robot1)
+                print(f"{self.robot2.nama} menyerang {self.robot1.nama} dan memberikan {damage} damage.")
+            elif aksi2 == 2:
+                heal = self.robot2.bertahan()
+                self.robot2.hp += heal
+                print(f"{self.robot2.nama} bertahan dan memulihkan {heal} HP.")
+            else:
+                print(f"{self.robot2.nama} menyerah! {self.robot1.nama} menang!")
+                break
+
+            # Periksa apakah robot 1 masih hidup
+            if not self.robot1.is_alive():
+                print(f"{self.robot1.nama} telah kalah. {self.robot2.nama} menang!")
+                break
+
+            self.round += 1
+
+    @staticmethod
+    def pilih_aksi(robot):
+        print(f"{robot.nama}, pilih aksi: 1. Attack  2. Defense  3. Giveup")
+        while True:
+            try:
+                pilihan = int(input(f"Masukkan pilihan untuk {robot.nama}: "))
+                if pilihan in [1, 2, 3]:
+                    return pilihan
+            except ValueError:
+                pass
+            print("Pilihan tidak valid, coba lagi.")
+
+if __name__ == "__main__":
+    robot1 = Robot("Atreus", 500, 100)
+    robot2 = Robot("Daedalus", 750, 80)
+    game = Game(robot1, robot2)
+    game.mulai()
